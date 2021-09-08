@@ -1,0 +1,86 @@
+<%- include('partials/header'); -%>
+
+<form action="/signup">
+  <h2>Account erstellen</h2>
+  <label for="name">Vorname</label>
+  <input type="text" name="name" required />
+  <div class="name error"></div>
+
+  <label for="surname">Nachname</label>
+  <input type="text" name="surname" required />
+  <div class="surname error"></div>
+
+  <label for="phone">Handynummer</label>
+  <input type="text" name="phone" required />
+  <div class="phone error"></div>
+
+  <label for="company">Verband</label>
+  <input type="text" name="company" placeholder="DRK KV Musterstadt" required />
+  <div class="company error"></div>
+
+  <label for="email">Email</label>
+  <input type="text" name="email" required />
+  <div class="email error"></div>
+
+  <label for="password">Passwort</label>
+  <input type="password" name="password" required />
+  <div class="password error"></div>
+  <button>Registrieren</button>
+</form>
+
+<%- include('partials/footer'); -%>
+
+<script>
+  const form = document.querySelector('form');
+  const nameError = document.querySelector('.name.error');
+  const surnameError = document.querySelector('.surname.error');
+  const phoneError = document.querySelector('.phone.error');
+  const companyError = document.querySelector('.company.error')
+  const emailError = document.querySelector('.email.error');
+  const passwordError = document.querySelector('.password.error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // reset errors
+    nameError.textContent =''
+    surnameError.textContent = ''
+    phoneError.textContent = ''
+    companyError.textContent = ''
+    emailError.textContent = ''
+    passwordError.textContent = ''
+
+    // get values
+    const name = form.name.value
+    const surname = form.surname.value
+    const phone = form.phone.value
+    const company = form.company.value
+    const email = form.email.value
+    const password = form.password.value
+
+    try {
+      const res = await fetch('/signup', { 
+        method: 'POST', 
+        body: JSON.stringify({ name, surname, phone, company, email, password }),
+        headers: {'Content-Type': 'application/json'}
+      });
+      const data = await res.json();
+      console.log(data);
+      if (data.errors) {
+        nameError.textContent = data.errors.name
+        surnameError.textContent = data.errors.surname
+        phoneError.textContent = data.errors.phone
+        companyError.textContent = data.errors.company
+        emailError.textContent = data.errors.email
+        passwordError.textContent = data.errors.password
+      }
+      if (data.user) {
+        location.assign('status')
+      }
+    }
+    catch (err) {
+      console.log(err);
+    }
+
+  });
+</script>

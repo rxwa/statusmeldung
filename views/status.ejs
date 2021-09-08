@@ -1,0 +1,98 @@
+<%- include('partials/header') -%>
+
+<form action="/status">
+  <h2>Statusmeldung</h2>
+  <!-- CaseID + error message -->
+  <label for="caseid">Fall-ID</label>
+  <input type="text" name="caseid" value="DRK-2021-" maxlength="14" required>
+  <div class="caseid error"></div>
+
+  <!-- Status selection + error message -->
+  <label for="status">Status</label>
+  <select class="contact-drop-down" name="status" id="status" onchange="dropDown()">
+    <option value="3">Status 3</option>
+    <option value="4">Status 4</option>
+    <option value="7">Status 7</option>
+    <option value="8">Status 8</option>
+  </select>
+  <div class="status error"></div>
+
+  <!-- variable ZEK field -->
+  <label for="zek" id="zeklabel"></label>
+  <div id="zek" class="zek error"></div>
+
+  <button>Status senden</button>
+</form>
+
+<%- include('partials/footer') -%>
+
+<script>
+  const form = document.querySelector('form')
+  const caseidError = document.querySelector('.caseid.error')
+  const statusError = document.querySelector('.status.error')
+  const statusSelector = document.getElementById('status')
+  const zekSelector = document.getElementById('zek')
+  const form_zek = document.querySelector('select')
+  const zeklabel = document.getElementById('zeklabel')
+
+  function dropDown() {
+    // dynamic form - generates textarea field on status 8 selection
+    if (statusSelector.value == "8") {
+      const textarea = document.createElement('textarea')
+      zeklabel.innerHTML = "ZEK"
+      textarea.id = 'zeki'
+      textarea.class = 'zeki'
+      textarea.name = 'zeki'
+      textarea.rows = 4
+      textarea.placeholder = "Zwischenfälle, Ereignisse, Verspätungen"
+      zekSelector.appendChild(textarea)
+    } else {
+      let zeki = document.getElementById("zeki")
+      if (zeki !== null) {
+        zeki.parentNode.removeChild(zeki)
+        zeklabel.innerHTML = ""
+        return false
+      }
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+
+    // reset errors
+    caseidError.textContent = ''
+    statusError.textContent = ''
+
+    // get values
+    const caseid = form.caseid.value
+    const status = form.status.value
+    
+    let inputs = { caseid, status }
+
+    if(typeof zeki !== 'undefined') { 
+      inputs.zeki = zeki.value
+    }
+    
+
+    try {
+      console.log(inputs)
+      const res = await fetch('/status', { 
+        method: 'POST', 
+        body: JSON.stringify(inputs),
+        headers: {'Content-Type': 'application/json'}
+      })
+      const data = await res.json()
+      console.log(data)
+      if (data.errors) {
+        emailError.textContent = data.errors.email
+        passwordError.textContent = data.errors.password
+      }
+      if (data.user) {
+        location.assign('/status')
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  })
+</script>
