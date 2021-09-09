@@ -2,6 +2,7 @@
 
 <form action="/status">
   <h2>Statusmeldung</h2>
+  <div id="success" class="success"></div>
   <!-- CaseID + error message -->
   <label for="caseid">Fall-ID</label>
   <input type="text" name="caseid" value="DRK-2021-" maxlength="14" required>
@@ -34,6 +35,7 @@
   const zekSelector = document.getElementById('zek')
   const form_zek = document.querySelector('select')
   const zeklabel = document.getElementById('zeklabel')
+  const success = document.querySelector('.success')
 
   function dropDown() {
     // dynamic form - generates textarea field on status 8 selection
@@ -62,6 +64,7 @@
     // reset errors
     caseidError.textContent = ''
     statusError.textContent = ''
+    success.textContent = ''
 
     // get values
     const caseid = form.caseid.value
@@ -79,16 +82,27 @@
       const res = await fetch('/status', { 
         method: 'POST', 
         body: JSON.stringify(inputs),
-        headers: {'Content-Type': 'application/json'}
+        headers: {'Content-Type': 'application/json'},
       })
       const data = await res.json()
       console.log(data)
+
+      // success message
+      success.style.backgroundColor = "7ECC49"
+      success.textContent = 'Status erfolgreich übermittelt'
+
+      // reset form after success
+      form.reset()
+      zeki.parentNode.removeChild(zeki)
+      zeklabel.innerHTML = ""
+      
       if (data.errors) {
         emailError.textContent = data.errors.email
         passwordError.textContent = data.errors.password
       }
       if (data.user) {
         location.assign('/status')
+
       }
     }
     catch (err) {

@@ -1,0 +1,16 @@
+<%- include('partials/header'); -%>
+  <% status.forEach(stati => {%>
+    <div class="status">
+      <div class="statusheader">
+        Fall-ID: <%= stati.caseid %> |
+        Status: <%= stati.stati %> | 
+        Zeit: <%= stati.statusdate %>
+      </div>
+      <div class="statusfooter">
+        Gemeldet von: <%= stati.name %> <%= stati.surname %> | 
+        <a href="tel:<% stati.phone %>"><%= stati.phone %></a> | 
+        <%= stati.company %>
+      </div>
+    </div>
+  <% }) %>
+<%- include('partials/footer'); -%>

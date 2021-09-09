@@ -1,32 +1,41 @@
 require('dotenv').config()
-const express = require('express');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/authRoutes');
-const statusRoutes = require('./routes/statusRoutes');
-const cookieParser = require('cookie-parser');
-const { requireAuth, checkUser } = require('./middleware/authMiddleware');
+const express = require('express')
+const mongoose = require('mongoose')
+const authRoutes = require('./routes/authRoutes')
+const statusRoutes = require('./routes/statusRoutes')
+const cookieParser = require('cookie-parser')
+const Status = require('./models/Status')
+const { requireAuth, checkUser } = require('./middleware/authMiddleware')
 
-const app = express();
+const app = express()
 
 // middleware
-app.use(express.static('public'));
-app.use(express.json());
-app.use(cookieParser());
+app.use(express.static('public'))
+app.use(express.json())
+app.use(cookieParser())
 
 // view engine
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs')
 
 // database connection
 mongoose.connect(process.env.DATABASE_CONN, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
   .then((result) => app.listen(3000))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log(err))
 
 // routes
-app.get('*', checkUser);
+app.get('*', checkUser)
 app.get('/', (req, res) => res.render('home'));
-app.get('/smoothies', requireAuth, (req, res) => res.render('smoothies'));
-app.use(statusRoutes);
-app.use(authRoutes);
+app.get('/smoothies', requireAuth, (req, res) => res.render('smoothies'))
+app.get('/overview', requireAuth, async (req, res) => {
+  try {
+    const status = await Status.find({})
+    res.render('overview', { status })
+  } catch {
+    res.redirect('/')
+  }
+})
+app.use(statusRoutes)
+app.use(authRoutes)
 
 
 // TODO
