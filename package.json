@@ -13,7 +13,7 @@
     "mongoose": "^5.13.8",
     "nodemailer": "^6.6.3",
     "validator": "^13.6.0",
-    "mpath": ">=0.8.4"
+    "mpath": "^0.8.4"
   },
   "devDependencies": {},
   "scripts": {
